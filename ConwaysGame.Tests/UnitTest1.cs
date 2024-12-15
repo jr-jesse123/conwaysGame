@@ -20,33 +20,34 @@ namespace ConwaysGame.Tests
         public void test()
         {
             
-            var x = GenerateAllCombinations(8)
-                .Select(k =>
+            var x = GenerateAllCombinations(8);
+            var boardsAndExpectedLiveness = x.Select(combination =>
+            {
+                var board = new bool[3, 3];
+                int index = 0;
+                
+                for (int row = 0; row < 3; row++)
                 {
-                    GameBoard board = new bool[3, 3];
-
-                    for (int i = 0; i < k.Length; i++)
+                    for (int col = 0; col < 3; col++)
                     {
-                        var _i = i;
-
-                        if (_i == 4) _i++;
-
-                        var line = _i % 3;
-                        
-                        var column = _i - line;
-
-                        Console.WriteLine("line:" + line.ToString() + " column:" + column.ToString());
-
-                        board[line, column] = k[i];
+                        if (row == 1 && col == 1) continue; // Skip center position
+                        board[row, col] = combination[index++];
                     }
+                }
+                
+                return (board, combination.Count(k => k));
+            }).ToArray();
 
 
-                    return board;
-                })
-                .ToArray();
 
-            
-            
+            boardsAndExpectedLiveness.Should().AllSatisfy(x =>
+            {
+                GameBoardModule.GetLiveNeighbors(x.board, 1, 1).Should().Be(x.Item2);
+            });
+
+
+
+
         }
 
         private static IEnumerable<bool[]> GenerateAllCombinations(int length)
