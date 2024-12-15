@@ -14,9 +14,21 @@ namespace ConwaysGame.Tests
         //{
         //    GameBoardModule.GetLiveNeighbors(board, 1, 1).Should().Be(expectedNeighbors);
 
-        //}
 
         [Fact]
+        public void test2()
+        { 
+            GameBoard2 gameBoard2 = new GameBoard2();
+
+            
+
+            //Span<bool> bools = stackalloc bool[x];
+        }
+
+
+            //}
+
+            [Fact]
         public void test()
         {
             

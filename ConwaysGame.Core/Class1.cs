@@ -12,11 +12,88 @@ Any dead cell with exactly three live neighbors becomes a live cell, as if by re
 
 global using GameBoard = bool[,];
 global using LivePopulation = (int x, int y)[];
-
 namespace ConwaysGame.Core;
+
+
+public ref struct GameBoard2
+{
+    private readonly int _gridLenght;
+    private Span<bool> _board;
+    
+    public readonly Span<bool> Board { get => _board;  }
+
+    public void NextGeneration()
+    {
+        Span<bool> newBoard = new bool[_board.Length];
+
+        for (int x = 0; x < _board.Length; x++)
+        {
+            for (int y = 0; y < _gridLenght; y++)
+            {
+                int liveNeighbors = GetLiveNeighBors(x, y);
+                if (_board[x * _gridLenght + y])
+                {
+                    newBoard[x * _gridLenght + y] = liveNeighbors == 2 || liveNeighbors == 3;
+                }
+                else
+                {
+                    newBoard[x * _gridLenght + y] = liveNeighbors == 3;
+                }
+            }
+        }
+        _board = newBoard;
+    }
+
+    //TODO: FAZER INTERNO
+    //TODO: TENTAR OPTIMIZAR
+    public int GetLiveNeighBors(int x, int y)
+    {
+        int count = 0;
+
+
+        for (sbyte horizontalDelta = -1; horizontalDelta <= 1; horizontalDelta++)
+        {
+            for (sbyte verticalDelta = -1; verticalDelta <= 1; verticalDelta++)
+            {
+                if (horizontalDelta == 0 && verticalDelta == 0) continue; //current cell
+
+                int horizontalShift = x + horizontalDelta;
+                int verticalShift = y + verticalDelta;
+                var targetIndex = horizontalShift * _gridLenght + verticalShift;
+                
+                if (horizontalShift >= 0 && horizontalShift < _gridLenght && 
+                    verticalShift >= 0 && verticalShift < _gridLenght && 
+                    _board[targetIndex])
+                {
+                    count++;
+                }
+                
+            }
+        }
+        return count;
+    }
+
+    
+
+
+
+    public GameBoard2(Span<bool> board)
+    {
+        if (Math.Sqrt(board.Length) % 1 != 0)
+        {
+            throw new ArgumentException("The board length must be a perfect square.");
+        }
+        _board = board;
+        _gridLenght = (int)Math.Sqrt(board.Length);
+    }
+
+
+
+}
+
 public class GameBoardModule
 {
-    public static GameBoard Create(int x, int y) => new bool[x, y];
+
     
     public static GameBoard Populate(GameBoard board, LivePopulation population)
     {
