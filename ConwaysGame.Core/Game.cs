@@ -57,7 +57,7 @@ public class Game
 
         if (Math.Sqrt(gridLenght) % 1 != 0 || gridLenght == 1 || gridLenght == 0)
         {
-            throw new ArgumentException("The board length must be a perfect square.");
+            throw new BrokenRuleException("The board length must be a perfect square.");
         }
 
         TotalGridCeels = gridLenght;
@@ -135,7 +135,7 @@ public class Game
 
         if (Generation >= MaxGenerations)
         {
-            throw new MaxGenerationsReachedException("The maximum number of generations has been reached.");
+            throw new BrokenRuleException("The maximum number of generations has been reached.");
         }
 
         for (int i = 0; i < LiveCeels.Count; i++)
@@ -169,11 +169,4 @@ public class Game
         Generation++;
     }
 
-}
-
-public class MaxGenerationsReachedException : Exception
-{
-    public MaxGenerationsReachedException(string message) : base(message)
-    {
-    }
 }

@@ -117,7 +117,7 @@ namespace ConwaysGame.Tests
         {
             var game = new Core.Game([], 9, 0);
             Action act = () => game.AdvanceGenerations(10);
-            act.Should().Throw<MaxGenerationsReachedException>();
+            act.Should().Throw<BrokenRuleException>();
         }
 
         [Fact]

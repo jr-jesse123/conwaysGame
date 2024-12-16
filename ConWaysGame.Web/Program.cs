@@ -49,9 +49,8 @@ public class Program
 
                     var statusCode = exception switch
                     {
-                        ArgumentNullException => StatusCodes.Status400BadRequest,
+                        ArgumentNullException or BrokenRuleException => StatusCodes.Status400BadRequest,
                         UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
-                        MaxGenerationsReachedException => StatusCodes.Status403Forbidden,
                         _ => StatusCodes.Status500InternalServerError
                     };
 
@@ -105,28 +104,5 @@ public class Program
 
 
         app.Run();
-    }
-}
-
-public record NextStateRequest(int Id, int NumberOfGenerations = int.MaxValue);
-
-public record Coords(int x, int y);
-
-public record NextStateResponse(int Id, int CurrentGeneration, List<Coords> LiveCells);
-
-public record StartGameRequest(List<Coords> LiveCells, int GameLenght);
-
-     
-public record StarGameResponse(int Id);
-
-public class ErrorDetails
-{
-    public int StatusCode { get; set; }
-    public string Message { get; set; }
-    public string? Details { get; set; } // Opcional, pode incluir informações adicionais
-
-    public override string ToString()
-    {
-        return System.Text.Json.JsonSerializer.Serialize(this);
     }
 }
