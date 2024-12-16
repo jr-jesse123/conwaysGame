@@ -1,8 +1,6 @@
 //global using GameBoard = bool[,];
 //global using LivePopulation = (int x, int y)[]; //TODO: duplicate global using
-using ConwaysGame.Core;
 using FluentAssertions;
-using System.Security.Cryptography.X509Certificates;
 
 namespace ConwaysGame.Tests
 {

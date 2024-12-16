@@ -18,25 +18,32 @@ using System.Buffers;
 namespace ConwaysGame.Core;
 
 
+public interface IGameRepository
+{
+    Task<Game> GetGameAsync(int id);
+    Task<int> SaveGameAsync(Game game);
+}
+
 public class Game
-    {
+{
+    public int Id { get; set; }
+
     private readonly int _gridSideLenght;
-    //private Span<(int x, int y)> _board;
     private List<(int x, int y)> _board;
 
-    ArrayPool<(int, int)> arrayPool = ArrayPool<(int,int)>.Shared;
+    private readonly ArrayPool<(int, int)> arrayPool = ArrayPool<(int,int)>.Shared;
 
-        public  List<(int x, int y)> LiveCeels { get => _board; }
+    public  List<(int x, int y)> LiveCeels { get => _board; }
     public int Generation { get; private set; } = 0;
 
-        public bool HasStabilized { get; private set; } = false;
+    public bool HasStabilized { get; private set; } = false;
 
-        private int MaxGenerations { get; init ; } = 1000;
-        private (int x, int y)[] newLiveCellsArray;
+    private int MaxGenerations { get; init ; } = 1000;
+    private (int x, int y)[] newLiveCellsArray;
 
-        private List<(int, int)> newLiveCells;
+    private List<(int, int)> newLiveCells;
 
-        private Dictionary<(int, int), int> positionsWithLiveNeighbors;
+    private Dictionary<(int, int), int> positionsWithLiveNeighbors;
 
 
     public Game()

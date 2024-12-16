@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using ConwaysGame.Infra;
+
 public class Program
 {
     public static void Main(string[] args)
@@ -9,7 +12,22 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
+        // Add EF Core
+        
+        builder.Services.AddGameRepository(options => {
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            options.UseSqlite(connectionString);
+        });
+        
+
         var app = builder.Build();
+
+        // Apply migrations
+        //using (var scope = app.Services.CreateScope())
+        //{
+        //    var db = scope.ServiceProvider.GetRequiredService<GameContext>();
+        //    db.Database.EnsureCreated();
+        //}
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
@@ -38,9 +56,20 @@ public class Program
         .WithName("GetWeatherForecast")
         .WithOpenApi();
 
-        app.MapPost("/game", (StartGameRequest startGameDto) =>
+        app.MapPost("/game", async (GameContext db, StartGameRequest startGameDto) =>
         {
+            //var game = new Game
+            //{
+            //    LiveCells = startGameDto.LiveCells.Select(cell => new CellPosition 
+            //    { 
+            //        X = cell.Item1, 
+            //        Y = cell.Item2 
+            //    }).ToList()
+            //};
             
+            //db.Games.Add(game);
+            //await db.SaveChangesAsync();
+
             return Results.Ok(new StarGameResponse(0));
         })
         .WithName("StartGame")
