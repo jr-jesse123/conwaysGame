@@ -21,10 +21,4 @@
     <ProjectReference Include="..\ConwaysGame.Core\ConwaysGame.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="games.db">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>

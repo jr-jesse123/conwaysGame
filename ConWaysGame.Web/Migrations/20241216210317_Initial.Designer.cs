@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ConWaysGame.Web.Migrations
 {
     [DbContext(typeof(GameContext))]
-    [Migration("20241216171636_LiveCeelsProperty")]
-    partial class LiveCeelsProperty
+    [Migration("20241216210317_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,9 +31,14 @@ namespace ConWaysGame.Web.Migrations
                     b.Property<bool>("HasStabilized")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("LiveCeels")
+                    b.Property<string>("LiveCells")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("LiveCells");
+
+                    b.Property<int>("TotalGridCeels")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 

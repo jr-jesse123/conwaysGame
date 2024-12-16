@@ -16,6 +16,8 @@ namespace ConWaysGame.Web.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    TotalGridCeels = table.Column<int>(type: "INTEGER", nullable: false),
+                    LiveCells = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: false),
                     Generation = table.Column<int>(type: "INTEGER", nullable: false),
                     HasStabilized = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
