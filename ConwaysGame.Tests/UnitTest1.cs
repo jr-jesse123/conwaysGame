@@ -8,12 +8,7 @@ namespace ConwaysGame.Tests
 {
     public class UnitTest1
     {
-        //[Theory]
-        //[MemberData(nameof(boards))]
-        //public void CorrectNieghborNumber(GameBoard board, int expectedNeighbors)
-        //{
-        //    GameBoardModule.GetLiveNeighbors(board, 1, 1).Should().Be(expectedNeighbors);
-
+     
 
         [Fact]
         public void test2()

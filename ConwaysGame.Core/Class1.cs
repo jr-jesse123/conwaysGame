@@ -15,7 +15,7 @@ global using LivePopulation = (int x, int y)[];
 global using Gameboard3 = System.Span<(int x, int y)>;
 namespace ConwaysGame.Core;
 
-public ref struct Position
+public struct Position : IComparable<Position>
 {
     public int X { get; set; }
     public int Y { get; set; }
@@ -24,6 +24,56 @@ public ref struct Position
         X = x;
         Y = y;
     }
+
+    public int CompareTo(Position other)
+    {
+        return X.CompareTo(other.X) == 0 ? Y.CompareTo(other.Y) : X.CompareTo(other.X);
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is Position other)
+        {
+            return X == other.X && Y == other.Y;
+        }
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        return X.GetHashCode() ^ Y.GetHashCode();
+    }
+
+    public static bool operator ==(Position left, Position right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(Position left, Position right)
+    {
+        return !(left == right);
+    }
+
+    public static bool operator <(Position left, Position right)
+    {
+        return left.CompareTo(right) < 0;
+    }
+
+    public static bool operator <=(Position left, Position right)
+    {
+        return left.CompareTo(right) <= 0;
+    }
+
+    public static bool operator >(Position left, Position right)
+    {
+        return left.CompareTo(right) > 0;
+    }
+
+    public static bool operator >=(Position left, Position right)
+    {
+        return left.CompareTo(right) >= 0;
+    }
+}
 
     public class CellComparable : IComparer<(int x, int y)>
 {
@@ -40,6 +90,51 @@ public ref struct Position
 
 public static class GameBoardExtensions
 {
+    //TODO: DOCUEMNTAR
+    public static byte LookFoward(this ref Gameboard3 board, int idx, (int x, int y) targetValue)
+    {
+        var (baseX, baseY) = board[idx];
+        for (int i = idx + 1; i < board.Length; i++)
+        {
+            var (currentX, currentY) = board[i];
+
+            if (currentX == baseX && currentY == baseY)
+            {
+                return 0b0000_0001;
+            }
+
+            if (currentX > targetValue.x || currentY > targetValue.y)
+            {
+                break;
+            }
+        }
+
+        return 0b0000_0000;
+    }
+
+
+    public static byte LookBackWard(this ref Gameboard3 board, int idx, (int x, int y) targetValue)
+    {
+        var (baseX, baseY) = board[idx];
+        for (int i = idx + 1; i >= 0; i--)
+        {
+            var (currentX, currentY) = board[i];
+
+            if (currentX == baseX && currentY == baseY)
+            {
+                return 0b0000_0001;
+            }
+
+            if (currentX < targetValue.x || currentY < targetValue.y)
+            {
+                break;
+            }
+        }
+
+        return 0b0000_0000;
+    }
+
+
     public static Gameboard3 GetWhileXNotChangedAsc(this ref Gameboard3 board, int idx)
     {
         var (initialX, _) = board[idx];
@@ -118,30 +213,6 @@ public static class GameBoardExtensions
 
         public readonly Span<(int x, int y)> Board { get => _board; }
 
-    //public void NextGeneration()
-    //{
-    //    var newBoard = new (int x, int y)[_board.Length];
-    //    Span<(int x, int y)> newBoardSpan = newBoard;
-
-    //    for (int i = 0; i < _board.Length; i++)
-    //    {
-    //        var cell = _board[i];
-    //        int liveNeighbors = GetLiveNeighBors(cell.x, cell.y);
-
-    //        if (liveNeighbors == 2 || liveNeighbors == 3)
-    //        {
-    //            newBoardSpan[i] = cell;
-    //        }
-    //        else if (liveNeighbors == 3)
-    //        {
-    //            newBoardSpan[i] = cell;
-    //        }
-    //    }
-
-    //    _board = newBoardSpan;
-    //}
-
-
     public GameBoard2(Gameboard3 board)
     {
         
@@ -157,92 +228,100 @@ public static class GameBoardExtensions
 
     }
 
-    public enum NeighBorPosition
-    { 
-        Left,
-        Right,
-        Upper,
-        Lower,
-        UpperLeft,
-        UpperRight,
-        LowerLeft,
-        LowerRight
-    }
 
-
-    private static (int, int)? IsNeighborAlive(Gameboard3 board, int currentIdx, NeighBorPosition position)
-    {
-        var (currentX, currentY) = board[currentIdx];
-
-        var (newX, newY) = position switch
-        {
-            NeighBorPosition.Left => (currentX, currentY - 1),
-            NeighBorPosition.Right => (currentX, currentY + 1),
-            NeighBorPosition.Upper => (currentX - 1, currentY),
-            NeighBorPosition.Lower => (currentX + 1, currentY),
-            NeighBorPosition.UpperLeft => (currentX - 1, currentY - 1),
-            NeighBorPosition.UpperRight => (currentX - 1, currentY + 1),
-            NeighBorPosition.LowerLeft => (currentX + 1, currentY - 1),
-            NeighBorPosition.LowerRight => (currentX + 1, currentY + 1),
-            _ => throw new ArgumentException("Invalid position")
-        };
-
-        board.BinarySearch(new CellComparable());
-
-    }
 
     //TODO: FAZER INTERNO
     //TODO: TENTAR OPTIMIZAR
     public int GetLiveNeighBors(int idx)
-        {
-        var upperLine = _board.GetUpperLine(idx);
-        var lowerLine = _board.GetLowerLine(idx);
+    {
+        
 
-        (int , int)? NearestleftNeigbor = idx - 1 >= 0 ? _board[idx - 1] : null;
+        var (x, y) = _board[idx];
 
-        (int, int)? nearestRightNeigbor = idx + 1 < _board.Length ? _board[idx + 1] : null;
+        return 
+            _board.LookBackWard(idx, (x - 1, y)) +
+            _board.LookFoward(idx, (x + 1, y)) +
 
-        _board
+            _board.LookFoward(idx, (x, y - 1) ) +
+            _board.LookFoward(idx, (x, y + 1)) +
+            _board.LookBackWard(0, (x - 1, y - 1)) +
 
+            _board.LookFoward(0, (x - 1, y + 1)) +
 
+            _board.LookBackWard(0, (x + 1, y - 1)) +
+            _board.LookFoward(0, (x + 1, y + 1));
 
-
-
-            for (sbyte horizontalDelta = -1; horizontalDelta <= 1; horizontalDelta++)
-        {
-            for (sbyte verticalDelta = -1; verticalDelta <= 1; verticalDelta++)
-            {
-                if (horizontalDelta == 0 && verticalDelta == 0) continue; //current cell
-
-                int horizontalShift = x + horizontalDelta;
-                int verticalShift = y + verticalDelta;
-                var targetIndex = horizontalShift * _gridLenght + verticalShift;
-
-                if (horizontalShift >= 0 && horizontalShift < _gridLenght &&
-                    verticalShift >= 0 && verticalShift < _gridLenght &&
-                    _board[targetIndex])
-                {
-                    count++;
-                }
-
-            }
-        }
-        return count;
     }
 
 
+    /*
+     Any live cell with fewer than two live neighbors dies, as if by underpopulation.
+    Any live cell with two or three live neighbors lives on to the next generation.
+    Any live cell with more than three live neighbors dies, as if by overpopulation.
+    Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
+     */
 
 
+    public void AddNeighbors(int idx, Dictionary<(int,int), int> acc)
+    {
+        Span<(int x, int y)?> neighbors = stackalloc  (int x, int y)?[8];
+        var (x, y) = _board[idx];
 
-    //public GameBoard2(Span<bool> board)
-    //{
-    //    if (Math.Sqrt(board.Length) % 1 != 0)
-    //    {
-    //        throw new ArgumentException("The board length must be a perfect square.");
-    //    }
-    //    _board = board;
-    //    _gridLenght = (int)Math.Sqrt(board.Length);
-    //}
+        neighbors[0] = (x - 1, y);
+        neighbors[1] = (x + 1, y);
+        neighbors[2] = (x, y - 1);
+        neighbors[3] = (x, y + 1);
+        neighbors[4] = (x - 1, y - 1);
+        neighbors[5] = (x - 1, y + 1);
+        neighbors[6] = (x + 1, y - 1);
+        neighbors[7] = (x + 1, y + 1);
+
+        for (int i = 0; i < neighbors.Length; i++)
+        {
+            if (acc.ContainsKey((x, y)))
+            {
+                acc[(x, y)]++;
+            }
+            else
+            {
+                acc[(x, y)] = 1;
+            } 
+        }
+
+    }
+
+
+    public void AdvanceGeneration()
+    {
+        var positionsWithLiveNeihbors = new Dictionary<(int, int), int>();
+
+        for (int i = 0; i < Board.Length; i++)
+        {
+            AddNeighbors(i, positionsWithLiveNeihbors);
+        }
+
+        Span<(int,int)> newLiveCells = stackalloc (int x, int y)[ _gridLenght * _gridLenght];
+        var currentIdx = 0;
+        foreach (var (x, y) in positionsWithLiveNeihbors.Keys)
+        {
+            if(x < 0 || y < 0 || x > _gridLenght * _gridLenght || y > _gridLenght * _gridLenght)
+                continue;
+
+            var liveNeighbors = positionsWithLiveNeihbors[(x, y)];
+            if (liveNeighbors == 2 || liveNeighbors == 3)
+            {
+                newLiveCells[currentIdx++] = (x, y);
+            }
+            else if (liveNeighbors == 3 && Board.Contains((x,y))) //TODO: MAYBE USE BINARY OR STORE THE POSITIONS IN A HASHSET
+            {
+                newLiveCells[currentIdx++] = (x, y); //TODO: CHECAR PARA O VOLUME DE CÓPIAS DO VALOR DE TUPLAS.
+            }
+        }
+
+        newLiveCells.CopyTo(_board);
+
+    }
+
 
 
 
