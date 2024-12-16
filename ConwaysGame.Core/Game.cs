@@ -28,8 +28,7 @@ public class Game
 {
     public int Id { get; set; }
 
-    private int _gridSideLenght;
-    //private List<(int x, int y)> _liveCeels;
+    public int TotalGridCeels { get; private set; }
 
     private readonly ArrayPool<(int, int)> arrayPool = ArrayPool<(int,int)>.Shared;
 
@@ -63,7 +62,7 @@ public class Game
             throw new ArgumentException("The board length must be a perfect square.");
         }
 
-        _gridSideLenght = gridLenght;
+        TotalGridCeels = gridLenght;
         LiveCeels = board.ToList();
         MaxGenerations = maxGenerations;
         LiveCeels.Sort(new CellComparer());
@@ -74,9 +73,9 @@ public class Game
 
     private void EnsureInitialized()
     {
-        newLiveCellsArray ??= arrayPool.Rent(_gridSideLenght);
+        newLiveCellsArray ??= arrayPool.Rent(TotalGridCeels);
         newLiveCells ??= new List<(int, int)>(newLiveCellsArray);
-        positionsWithLiveNeighbors ??= new Dictionary<(int, int), int>(_gridSideLenght);
+        positionsWithLiveNeighbors ??= new Dictionary<(int, int), int>(TotalGridCeels);
     }
 
 
@@ -135,7 +134,7 @@ public class Game
         newLiveCells.Clear();
         foreach (var (x, y) in positionsWithLiveNeighbors.Keys)
         {
-            if(x < 0 || y < 0 || x > Math.Sqrt(_gridSideLenght) - 1 || y > Math.Sqrt(_gridSideLenght) - 1)
+            if(x < 0 || y < 0 || x > Math.Sqrt(TotalGridCeels) - 1 || y > Math.Sqrt(TotalGridCeels) - 1)
                 continue;
 
             var liveNeighbors = positionsWithLiveNeighbors[(x, y)];

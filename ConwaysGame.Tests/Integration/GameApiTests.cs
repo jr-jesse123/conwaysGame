@@ -102,7 +102,7 @@ public class GameApiTests : IClassFixture<WebApplicationFactory<Program>>
 
         stateObject.CurrentGeneration.Should().Be(1);
 
-        stateObject.LiveCells.Should().BeEquivalentTo([(0,1), (1,1), (2,1)]);
+        stateObject.LiveCells.Should().BeEquivalentTo([new Coords(0,1), new(1,1), new(2, 1)]);
 
     }
 
