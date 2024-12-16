@@ -19,7 +19,7 @@ namespace ConwaysGame.Tests
 
             foreach (var input in inputs)
             {
-                var game = new Game(new Span<(int x, int y)>([input]), 9);
+                var game = new Game([input], 9);
                 game.AdvanceGeneration();
                 game.Board.ToArray().Count().Should().Be(0);
             }

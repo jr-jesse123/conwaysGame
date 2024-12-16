@@ -13,6 +13,8 @@ Any dead cell with exactly three live neighbors becomes a live cell, as if by re
 
 
 
+using System.Buffers;
+
 namespace ConwaysGame.Core;
 
 public class CellComparer : IComparer<(int x, int y)>
@@ -149,10 +151,13 @@ public class CellComparer : IComparer<(int x, int y)>
     public ref struct Game
     {
     private readonly int _gridSideLenght;
-    private Span<(int x, int y)> _board;
+    //private Span<(int x, int y)> _board;
+    private List<(int x, int y)> _board;
 
-        public readonly ReadOnlySpan<(int x, int y)> Board { get => _board;  }
-        public int Generation { get; private set; } = 0;
+    ArrayPool<(int, int)> arrayPool = ArrayPool<(int,int)>.Shared;
+        //public readonly ReadOnlySpan<(int x, int y)> Board { get => _board;  }
+        public readonly List<(int x, int y)> Board { get => _board; }
+    public int Generation { get; private set; } = 0;
 
         public bool HasStabilized { get; private set; } = false;
 
@@ -163,19 +168,21 @@ public class CellComparer : IComparer<(int x, int y)>
         throw new NotSupportedException("You must provide a board to start the game.");
     }
 
-    public Game(Span<(int x, int y)> board, int gridLenght,  int maxGenerations = 1000)
+    public Game(IEnumerable<(int x, int y)> board, int gridLenght,  int maxGenerations = 1000)
     {
 
         if (Math.Sqrt(gridLenght) % 1 != 0)
         {
             throw new ArgumentException("The board length must be a perfect square.");
         }
-        board.Sort(new CellComparer());
+        //board.Sort(new CellComparer());
 
         MaxGenerations = maxGenerations;
         _gridSideLenght = gridLenght;
-        _board = stackalloc (int,int)?[1];
+        _board = board.ToList();
+        _board.Sort(new CellComparer());
         //_gridLenght = (int)Math.Sqrt(board.Length) ;
+
 
     }
 
@@ -223,13 +230,16 @@ public class CellComparer : IComparer<(int x, int y)>
         }
         var positionsWithLiveNeihbors = new Dictionary<(int, int), int>();
 
-        for (int i = 0; i < Board.Length; i++)
+        for (int i = 0; i < Board.Count; i++)
         {
             AddNeighbors(i, positionsWithLiveNeihbors);
         }
 
-        Span<(int,int)> newLiveCells = stackalloc (int x, int y)[_gridSideLenght ^ 2];
-        var currentIdx = 0;
+        //Span<(int,int)> newLiveCells = stackalloc (int x, int y)[_gridSideLenght ^ 2];
+
+        var internalArray = arrayPool.Rent(_gridSideLenght);
+        var newLiveCells = new List<(int x, int y)>(internalArray);
+        newLiveCells.Clear();
         foreach (var (x, y) in positionsWithLiveNeihbors.Keys)
         {
             if(x < 0 || y < 0 || x > _gridSideLenght || y > _gridSideLenght)
@@ -238,11 +248,13 @@ public class CellComparer : IComparer<(int x, int y)>
             var liveNeighbors = positionsWithLiveNeihbors[(x, y)];
             if (liveNeighbors == 2 || liveNeighbors == 3)
             {
-                newLiveCells[currentIdx++] = (x, y);
+                //newLiveCells[currentIdx++] = (x, y);
+                newLiveCells.Add((x, y));
             }
             else if (liveNeighbors == 3 && Board.Contains((x,y))) //TODO: MAYBE USE BINARY OR STORE THE POSITIONS IN A HASHSET
             {
-                newLiveCells[currentIdx++] = (x, y); //TODO: CHECAR PARA O VOLUME DE CÓPIAS DO VALOR DE TUPLAS.
+                //newLiveCells[currentIdx++] = (x, y); //TODO: CHECAR PARA O VOLUME DE CÓPIAS DO VALOR DE TUPLAS.
+                newLiveCells.Add((x, y));
             }
         }
 
@@ -251,7 +263,10 @@ public class CellComparer : IComparer<(int x, int y)>
             HasStabilized = true;
         }
 
-        newLiveCells.TryCopyTo(_board);
+        _board.Clear();
+        _board.AddRange(newLiveCells);  
+
+        arrayPool.Return(internalArray);
 
         Generation++;
     }
