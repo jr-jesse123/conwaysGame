@@ -147,4 +147,35 @@ public class GameApiTests : IClassFixture<WebApplicationFactory<Program>>
 
     }
 
+
+    [Fact]
+    public async Task Get_Game_State_ToCompletion_GetsError()
+    {
+        // Arrange
+        var client = _factory.CreateClient();
+        var payload = new StartGameRequest(
+            [new(0, 1), new(1, 1), new(2, 1)],
+            9
+            );
+
+        // Act
+        var response = await client.PostAsync("/game", JsonContent.Create(payload, options: new JsonSerializerOptions() { IncludeFields = true }));
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        var gameResponse = Deserialize<StarGameResponse>(content);
+
+        var stateResponse = await client.PostAsync($"/game/{gameResponse.Id}", JsonContent.Create(new NextStateRequest(gameResponse.Id)));
+
+        var stateResponseContent = await stateResponse.Content.ReadAsStringAsync();
+
+        var stateObject = Deserialize<NextStateResponse>(stateResponseContent);
+
+        stateObject.CurrentGeneration.Should().Be(3);
+
+        stateObject.LiveCells.Should().BeEquivalentTo([new Coords(1, 1), new(1, 2), new(2, 1), new(2, 2)]);
+
+    }
+
+
 }
