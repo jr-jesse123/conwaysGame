@@ -62,7 +62,7 @@ public class Program
                 return Results.NotFound();
             }
 
-            game.AdvanceGeneration();
+            game.AdvanceGenerations(request.NumberOfGenerations);
 
             return Results.Ok(new NextStateResponse(game.Id,game.Generation, game.LiveCeels.Select(c => new Coords(c.x, c.y)).ToList()));
             
@@ -75,7 +75,7 @@ public class Program
     }
 }
 
-public record NextStateRequest(int Id);
+public record NextStateRequest(int Id, int NumberOfGenerations = 1);
 
 public record Coords(int x, int y);
 

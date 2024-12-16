@@ -44,7 +44,7 @@ public class GameApiTests : IClassFixture<WebApplicationFactory<Program>>
                 });
 
                 var context = services.BuildServiceProvider().GetRequiredService<GameContext>();
-                //context.Database.EnsureDeleted();
+                context.Database.EnsureDeleted();
                 //context.Database.OpenConnection();
                 //context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
@@ -103,6 +103,36 @@ public class GameApiTests : IClassFixture<WebApplicationFactory<Program>>
         stateObject.CurrentGeneration.Should().Be(1);
 
         stateObject.LiveCells.Should().BeEquivalentTo([new Coords(0,1), new(1,1), new(2, 1)]);
+
+    }
+
+
+    [Fact]
+    public async Task Get_Game_State_Retuns_WithManyGenerations()
+    {
+        // Arrange
+        var client = _factory.CreateClient();
+        var payload = new StartGameRequest(
+            [new(1, 0), new(1, 1), new(1, 2)],
+            9
+            );
+
+        // Act
+        var response = await client.PostAsync("/game", JsonContent.Create(payload, options: new JsonSerializerOptions() { IncludeFields = true }));
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        var gameResponse = Deserialize<StarGameResponse>(content);
+
+        var stateResponse = await client.PostAsync($"/game/{gameResponse.Id}", JsonContent.Create(new NextStateRequest(gameResponse.Id, 5)));
+
+        var stateResponseContent = await stateResponse.Content.ReadAsStringAsync();
+
+        var stateObject = Deserialize<NextStateResponse>(stateResponseContent);
+
+        stateObject.CurrentGeneration.Should().Be(5);
+
+        stateObject.LiveCells.Should().BeEquivalentTo([new Coords(0, 1), new(1, 1), new(2, 1)]);
 
     }
 
