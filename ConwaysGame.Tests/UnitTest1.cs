@@ -9,7 +9,6 @@ namespace ConwaysGame.Tests
     public class UnitTest1
     {
      
-
         [Fact]
         public void SingleCellDies()
         {
@@ -21,14 +20,63 @@ namespace ConwaysGame.Tests
             {
                 var game = new Game([input], 9);
                 game.AdvanceGeneration();
-                game.Board.ToArray().Count().Should().Be(0);
+                game.LiveCeels.Count.Should().Be(0);
             }
         }
-        
 
-            //}
+        [Fact]
+        public void LiveCellsWithTwoLivingNeighborsKeepAlive()
+        {
+            List<(int, int)[]> inputs = 
+                [
+                    [(1, 0), (1, 1), (1, 2)], // Horizontal
+                    [(0, 1), (1, 1), (2, 1)], // Vertical
+                    [(0, 0), (1, 1), (2, 2)], // Diagonal
+                    [(0, 2), (1, 1), (2, 0)], // Diagonal
+                    [(0, 0), (0, 1), (1, 0)], // Corner
+                    [(0, 2), (0, 1), (1, 2)], // Corner
+                    [(2, 0), (2, 1), (1, 0)], // Corner
+                    [(2, 2), (2, 1), (1, 2)], // Corner
+                ];
 
-            [Fact]
+            foreach (var input in inputs)
+            {
+                var game = new Game(input, 9);
+                game.AdvanceGeneration();
+                game.LiveCeels.Single(c => c == input[1]);
+            }
+        }
+
+
+        [Fact]
+        public void DeadCellsWithThreeLivingNeighborsAreBorn()
+        {
+            List<(int, int)[]> inputs =
+                [
+                    [(1, 0), (1, 1), (1, 2)], // Horizontal
+                    [(0, 1), (1, 1), (2, 1)], // Vertical
+                    [(0, 0), (1, 1), (2, 2)], // Diagonal
+                    [(0, 2), (1, 1), (2, 0)], // Diagonal
+                    [(0, 0), (0, 1), (1, 0)], // Corner
+                    [(0, 2), (0, 1), (1, 2)], // Corner
+                    [(2, 0), (2, 1), (1, 0)], // Corner
+                    [(2, 2), (2, 1), (1, 2)], // Corner
+                ];
+
+            foreach (var input in inputs)
+            {
+                var game = new Game(input, 9);
+                game.AdvanceGeneration();
+                game.LiveCeels.Single(c => c == input[1]);
+            }
+        }
+
+
+
+
+        //}
+
+        [Fact]
         public void test()
         {
 
