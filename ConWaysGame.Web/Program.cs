@@ -37,26 +37,13 @@ public class Program
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
-        app.MapGet("/weatherforecast", () =>
-        {
-            var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-                .ToArray();
-            return forecast;
-        })
-        .WithName("GetWeatherForecast")
-        .WithOpenApi();
+        
 
         app.MapPost("/game", async (IGameRepository repository, StartGameRequest startGameDto) =>
         {
             var game = new Game(startGameDto.LiveCells, startGameDto.GameLenght);
             var id = await repository.SaveGameAsync(game);
-            return Results.Ok(new StarGameResponse(id));
+            return Results.Ok(new StarGameResponse { Id = id});
         })
         .WithName("StartGame")
         .WithOpenApi();
@@ -69,10 +56,8 @@ public class Program
 public record StartGameRequest(List<(int, int)> LiveCells, int GameLenght);
 
      
-public record StarGameResponse(int Id);
-
-
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+public class StarGameResponse
 {
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    public required int Id { get; set; }
 }
+

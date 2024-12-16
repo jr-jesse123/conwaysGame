@@ -36,8 +36,13 @@ public class GameApiTests : IClassFixture<WebApplicationFactory<Program>>
 
                 services.AddGameRepository(options =>
                 {
-                    options.UseSqlite("DataSource=:memory:");
+                    options.UseSqlite("DataSource=:teste.db:", b => b.MigrationsAssembly("ConwaysGame.WEb"));
                 });
+
+                var context = services.BuildServiceProvider().GetRequiredService<GameContext>();
+                context.Database.OpenConnection();
+                context.Database.EnsureCreated();
+
             });
         });
     }
@@ -65,6 +70,7 @@ public class GameApiTests : IClassFixture<WebApplicationFactory<Program>>
 
         var content2 = await response.Content.ReadAsStringAsync();
         var gameResponse2 = JsonSerializer.Deserialize<StarGameResponse>(content);
-        gameResponse2!.Id.Should().BeGreaterThan(0);
+        
+        gameResponse2.Id.Should().BeGreaterThan(0);
     }
 } 
