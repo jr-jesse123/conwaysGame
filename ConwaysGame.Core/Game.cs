@@ -58,7 +58,7 @@ public class Game
     public Game(IEnumerable<(int x, int y)> board, int gridLenght,  int maxGenerations = 1000)
     {
 
-        if (Math.Sqrt(gridLenght) % 1 != 0 || gridLenght == 1)
+        if (Math.Sqrt(gridLenght) % 1 != 0 || gridLenght == 1 || gridLenght == 0)
         {
             throw new ArgumentException("The board length must be a perfect square.");
         }

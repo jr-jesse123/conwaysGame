@@ -6,6 +6,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using ConwaysGame.Core;
 using ConwaysGame.Web.Infra;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ConwaysGame.Tests.Integration;
 
@@ -21,9 +22,11 @@ public class GameApiTests : IClassFixture<WebApplicationFactory<Program>>
             {
                 // Remove both the GameRepository and GameContext registrations
                 var descriptors = services.Where(
-                    d => d.ServiceType == typeof(GameContext) ||
+                    d => d.ServiceType == typeof(GameContext)
+                         ||
                          d.ServiceType == typeof(IGameRepository) ||
-                         d.ServiceType == typeof(DbContextOptions<GameContext>))
+                         d.ServiceType == typeof(DbContextOptions<GameContext>)
+                         )
                     .ToList();
 
                 foreach (var descriptor in descriptors)
@@ -31,19 +34,10 @@ public class GameApiTests : IClassFixture<WebApplicationFactory<Program>>
                     services.Remove(descriptor);
                 }
 
-                // Add DbContext with in-memory database
-                //services.AddDbContext<GameContext>(options =>
-                //{
-                //    options.UseInMemoryDatabase("TestingDb");
-                //});
-
                 services.AddGameRepository(options =>
                 {
-                    options.UseInMemoryDatabase("TestingDb");
+                    options.UseSqlite("DataSource=:memory:");
                 });
-
-                // Add GameRepository
-                //services.AddScoped<IGameRepository, GameRepository>();
             });
         });
     }
@@ -68,6 +62,9 @@ public class GameApiTests : IClassFixture<WebApplicationFactory<Program>>
 
         var content = await response.Content.ReadAsStringAsync();
         var gameResponse = JsonSerializer.Deserialize<StarGameResponse>(content);
-        gameResponse!.Id.Should().BeGreaterThan(0);
+
+        var content2 = await response.Content.ReadAsStringAsync();
+        var gameResponse2 = JsonSerializer.Deserialize<StarGameResponse>(content);
+        gameResponse2!.Id.Should().BeGreaterThan(0);
     }
 } 

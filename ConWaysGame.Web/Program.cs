@@ -23,12 +23,7 @@ public class Program
         var app = builder.Build();
 
         // Ensure database is created and migrated
-        using (var scope = app.Services.CreateScope())
-        {
-            var dbContext = scope.ServiceProvider.GetRequiredService<GameContext>();
-            dbContext.Database.EnsureCreated();
-            dbContext.Database.Migrate();
-        }
+      
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
@@ -65,6 +60,7 @@ public class Program
         })
         .WithName("StartGame")
         .WithOpenApi();
+
 
         app.Run();
     }
