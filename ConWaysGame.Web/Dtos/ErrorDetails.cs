@@ -1,4 +1,4 @@
-﻿
+﻿namespace ConWaysGame.Web.Dtos;
 /// <summary>
 /// Error Details
 /// </summary>

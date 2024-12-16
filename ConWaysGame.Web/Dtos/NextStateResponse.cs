@@ -1,4 +1,6 @@
-﻿
+﻿namespace ConWaysGame.Web.Dtos;
+using ConWaysGame.Web.Dtos;
+
 /// <summary>
 /// Request to get the next state of the game
 /// </summary>

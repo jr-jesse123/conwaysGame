@@ -1,4 +1,6 @@
-﻿
+﻿namespace ConWaysGame.Web.Dtos;
+
+
 /// <summary>
 /// Two dimensional coordinates
 /// </summary>

@@ -25,7 +25,6 @@ public class GameContext: DbContext
 
             entity.Property(e => e.LiveCeels)
                 .HasConversion(
-                    //v => string.Join(";", v.Select(t => $"{t.x},{t.y}")),
                     v => ConvertTupleToString(v),
                     v => ConvertToTupleList(v),
                     new ValueComparer<List<(int x, int y)>>(
