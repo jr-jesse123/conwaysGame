@@ -17,138 +17,8 @@ using System.Buffers;
 
 namespace ConwaysGame.Core;
 
-public class CellComparer : IComparer<(int x, int y)>
-{
-    public int Compare((int x, int y) left, (int x, int y) right)
-    {
-        if (left.x == right.x)
-        {
-            return left.y.CompareTo(right.y);
-        }
-        return left.x.CompareTo(right.x);
 
-    }
-}
-
-//public static class GameBoardExtensions
-//{
-//    //TODO: DOCUEMNTAR
-//    public static byte LookFoward(this ref Gameboard board, int idx, (int x, int y) targetValue)
-//    {
-//        var (baseX, baseY) = board[idx];
-//        for (int i = idx + 1; i < board.Length; i++)
-//        {
-//            var (currentX, currentY) = board[i];
-
-//            if (currentX == baseX && currentY == baseY)
-//            {
-//                return 0b0000_0001;
-//            }
-
-//            if (currentX > targetValue.x || currentY > targetValue.y)
-//            {
-//                break;
-//            }
-//        }
-
-//        return 0b0000_0000;
-//    }
-
-
-//    public static byte LookBackWard(this ref Gameboard board, int idx, (int x, int y) targetValue)
-//    {
-//        var (baseX, baseY) = board[idx];
-//        for (int i = idx + 1; i >= 0; i--)
-//        {
-//            var (currentX, currentY) = board[i];
-
-//            if (currentX == baseX && currentY == baseY)
-//            {
-//                return 0b0000_0001;
-//            }
-
-//            if (currentX < targetValue.x || currentY < targetValue.y)
-//            {
-//                break;
-//            }
-//        }
-
-//        return 0b0000_0000;
-//    }
-
-
-//    public static Gameboard GetWhileXNotChangedAsc(this ref Gameboard board, int idx)
-//    {
-//        var (initialX, _) = board[idx];
-//        for (int delta = idx; delta < board.Length; delta++)
-//        {
-//            var (_x, _y) = board[delta];
-
-//            if (_x != initialX)
-//            {
-//                return board.Slice(idx, delta - idx);
-//            }
-//        }
-
-//        return Gameboard.Empty;
-//    }
-
-//    public static Gameboard GetWhileXNotChangedDesc(this ref Gameboard board, int idx)
-//    {
-//        var (initicalX, _) = board[idx];
-
-//        for (int delta = idx; delta >= 0; delta--)
-//        {
-//            var (_x, _y) = board[delta];
-//            if (_x != initicalX)
-//            {
-//                return board.Slice(delta, idx - delta);
-//            }
-//        }
-//        return Gameboard.Empty;
-
-//    } 
-
-//    //public static Gameboard GetUpperLine(this ref Gameboard board, int idx)
-//    //{
-//    //    var (x, y) = board[idx];
-//    //    for (int lineEnd = idx; lineEnd >= 0; lineEnd--)
-//    //    {
-//    //        var (_x, _y) = board[lineEnd];
-//    //        if (_x == x - 1)
-//    //        {
-//    //            return board.GetWhileXNotChangedDesc(lineEnd);
-//    //        }
-//    //        if (_x < x - 1)
-//    //        {
-//    //            return Gameboard.Empty;
-//    //        }
-//    //    }
-//    //    return Gameboard.Empty;
-
-//    //}
-
-//    //public static Gameboard GetLowerLine(this ref Gameboard board, int idx)
-//    //{
-//    //    var (x, y) = board[idx];
-//    //    for (int lineEnd = idx; lineEnd < board.Length; lineEnd++)
-//    //    {
-//    //        var (_x, _y) = board[lineEnd];
-//    //        if (_x == x + 1)
-//    //        {
-//    //            return board.GetWhileXNotChangedAsc(lineEnd);
-//    //        }
-//    //        if (_x > x + 1)
-//    //        {
-//    //            return Gameboard.Empty;
-//    //        }
-//    //    }
-//    //    return Gameboard.Empty;
-//    //}
-//}
-
-
-    public class Game
+public class Game
     {
     private readonly int _gridSideLenght;
     //private Span<(int x, int y)> _board;
@@ -254,7 +124,7 @@ public class CellComparer : IComparer<(int x, int y)>
         newLiveCells.Clear();
         foreach (var (x, y) in positionsWithLiveNeighbors.Keys)
         {
-            if(x < 0 || y < 0 || x > _gridSideLenght || y > _gridSideLenght)
+            if(x < 0 || y < 0 || x > Math.Sqrt(_gridSideLenght) - 1 || y > Math.Sqrt(_gridSideLenght) - 1)
                 continue;
 
             var liveNeighbors = positionsWithLiveNeighbors[(x, y)];
