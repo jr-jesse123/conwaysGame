@@ -47,7 +47,8 @@ public class Game
 
     private Game()
     {
-        
+        EnsureInitialized();
+
     }
 
     ~Game()
@@ -63,8 +64,9 @@ public class Game
         }
 
         _gridSideLenght = gridLenght;
-        iveCeels = board.ToList();
+        LiveCeels = board.ToList();
         MaxGenerations = maxGenerations;
+        LiveCeels.Sort(new CellComparer());
 
         EnsureInitialized();
 
@@ -72,8 +74,6 @@ public class Game
 
     private void EnsureInitialized()
     {
-        _liveCeels.Sort(new CellComparer());
-
         newLiveCellsArray ??= arrayPool.Rent(_gridSideLenght);
         newLiveCells ??= new List<(int, int)>(newLiveCellsArray);
         positionsWithLiveNeighbors ??= new Dictionary<(int, int), int>(_gridSideLenght);
@@ -83,7 +83,7 @@ public class Game
     public void AddNeighbors(int idx, Dictionary<(int,int), int> acc)
     {
         Span<(int x, int y)> neighbors = stackalloc  (int x, int y)[8];
-        var (x, y) = _liveCeels[idx];
+        var (x, y) = LiveCeels[idx];
 
         neighbors[0] = (x - 1, y);
         neighbors[1] = (x + 1, y);
@@ -153,8 +153,8 @@ public class Game
             HasStabilized = true;
         }
 
-        _liveCeels.Clear();
-        _liveCeels.AddRange(newLiveCells);  
+        LiveCeels.Clear();
+        LiveCeels.AddRange(newLiveCells);  
 
         Generation++;
     }

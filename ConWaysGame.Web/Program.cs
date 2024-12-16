@@ -14,6 +14,13 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
+        builder.Services.ConfigureHttpJsonOptions(options =>
+        {
+            options.SerializerOptions.PropertyNameCaseInsensitive = true;
+            options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            //options.SerializerOptions.IncludeFields = true;
+        });
+
         // Add EF Core
         builder.Services.AddGameRepository(options =>
         {
@@ -37,7 +44,7 @@ public class Program
 
         app.MapPost("/game", async (IGameRepository repository, StartGameRequest request) =>
         {
-            var game = new Game(request.LiveCells, request.GameLenght);
+            var game = new Game(request.LiveCells.Select(c => (c.x, c.y)), request.GameLenght);
             var id = await repository.SaveGameAsync(game);
             var uri = $"/game/{id}";
             return Results.Created(uri, new StarGameResponse(id));
@@ -57,7 +64,7 @@ public class Program
 
             game.AdvanceGeneration();
 
-            return Results.Ok(new NextStateResponse(game.Id,game.Generation, game.LiveCeels));
+            return Results.Ok(new NextStateResponse(game.Id,game.Generation, game.LiveCeels.Select(c => new Coords(c.x, c.y)).ToList()));
             
         })
         .WithName("NextState")
@@ -70,9 +77,11 @@ public class Program
 
 public record NextStateRequest(int Id);
 
-public record NextStateResponse(int Id, int CurrentGeneration, List<(int, int)> LiveCells);
+public record Coords(int x, int y);
 
-public record StartGameRequest(List<(int, int)> LiveCells, int GameLenght);
+public record NextStateResponse(int Id, int CurrentGeneration, List<Coords> LiveCells);
+
+public record StartGameRequest(List<Coords> LiveCells, int GameLenght);
 
      
 public record StarGameResponse(int Id);

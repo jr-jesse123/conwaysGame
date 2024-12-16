@@ -60,12 +60,12 @@ public class GameApiTests : IClassFixture<WebApplicationFactory<Program>>
         // Arrange
         var client = _factory.CreateClient();
         var payload = new StartGameRequest(
-            [(1, 1), (2, 2)],
+            [new (1, 1), new (2, 2)],
             9
             );
 
         // Act
-        var response = await client.PostAsync("/game", JsonContent.Create(payload));
+        var response = await client.PostAsync("/game", JsonContent.Create(payload, options: new JsonSerializerOptions() { IncludeFields = true }));
 
 
         // Assert
@@ -83,12 +83,12 @@ public class GameApiTests : IClassFixture<WebApplicationFactory<Program>>
         // Arrange
         var client = _factory.CreateClient();
         var payload = new StartGameRequest(
-            [(1,0), (1, 1), (1, 2)],
+            [new (1,0), new (1, 1), new(1, 2)],
             9
             );
 
         // Act
-        var response = await client.PostAsync("/game", JsonContent.Create(payload));
+        var response = await client.PostAsync("/game", JsonContent.Create(payload, options: new JsonSerializerOptions() { IncludeFields = true }));
 
         var content = await response.Content.ReadAsStringAsync();
 

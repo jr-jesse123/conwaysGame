@@ -23,7 +23,8 @@ public class GameContext: DbContext
 
             entity.Property(e => e.LiveCeels)
                 .HasConversion(
-                    v => string.Join(";", v.Select(t => $"{t.x},{t.y}")),
+                    //v => string.Join(";", v.Select(t => $"{t.x},{t.y}")),
+                    v => ConvertTupleToString(v),
                     v => ConvertToTupleList(v),
                     new ValueComparer<List<(int x, int y)>>(
                         (c1, c2) => c1.SequenceEqual(c2),
@@ -32,6 +33,11 @@ public class GameContext: DbContext
                     )
                 );
         });
+    }
+
+    private static string ConvertTupleToString(List<(int x, int y)> tuples)
+    {
+        return string.Join(";", tuples.Select(t => $"{t.x},{t.y}"));
     }
 
     private static List<(int x, int y)> ConvertToTupleList(string value)
