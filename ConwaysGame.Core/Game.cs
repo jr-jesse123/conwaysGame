@@ -45,10 +45,9 @@ public class Game
 
     private Dictionary<(int, int), int> positionsWithLiveNeighbors;
 
-
-    public Game()
+    private Game()
     {
-        throw new NotSupportedException("You must provide a board to start the game.");
+        
     }
 
     ~Game()

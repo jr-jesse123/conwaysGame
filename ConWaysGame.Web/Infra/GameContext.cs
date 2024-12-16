@@ -19,6 +19,9 @@ public class GameContext: DbContext
             entity.Property(e => e.Id)
                 .ValueGeneratedOnAdd()
                 .Metadata.SetBeforeSaveBehavior(PropertySaveBehavior.Ignore);
+
+            entity.Property(e => e.LiveCeels)
+                .HasConversion();
         });
     }
 }

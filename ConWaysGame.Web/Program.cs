@@ -33,20 +33,34 @@ public class Program
             app.UseSwaggerUI();
         }
 
-        var summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
 
-        
 
-        app.MapPost("/game", async (IGameRepository repository, StartGameRequest startGameDto) =>
+        app.MapPost("/game", async (IGameRepository repository, StartGameRequest request) =>
         {
-            var game = new Game(startGameDto.LiveCells, startGameDto.GameLenght);
+            var game = new Game(request.LiveCells, request.GameLenght);
             var id = await repository.SaveGameAsync(game);
-            return Results.Ok(new StarGameResponse { Id = id});
+            var uri = $"/game/{id}";
+            return Results.Created(uri, new StarGameResponse(id));
         })
         .WithName("StartGame")
+        .WithOpenApi();
+        
+
+        app.MapPost("/game/{Id:int}", async (IGameRepository repository, NextStateRequest request) =>
+        {
+            var game = await repository.GetGameAsync(request.Id);
+
+            if (game is null)
+            {
+                return Results.NotFound();
+            }
+
+            game.AdvanceGeneration();
+
+            return Results.Ok(new NextStateResponse(game.Id,game.Generation, game.LiveCeels));
+            
+        })
+        .WithName("NextState")
         .WithOpenApi();
 
 
@@ -54,11 +68,12 @@ public class Program
     }
 }
 
+public record NextStateRequest(int Id);
+
+public record NextStateResponse(int Id, int CurrentGeneration, List<(int, int)> LiveCells);
+
 public record StartGameRequest(List<(int, int)> LiveCells, int GameLenght);
 
      
-public class StarGameResponse
-{
-    public required int Id { get; set; }
-}
+public record StarGameResponse(int Id);
 

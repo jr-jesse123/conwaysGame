@@ -10,9 +10,9 @@ public class GameRepository : IGameRepository
     {
         this.context = context;
     }
-    public async Task<Game> GetGameAsync(int id)
+    public async Task<Game?> GetGameAsync(int id)
     {
-        throw new NotImplementedException();
+        return await context.Games.FindAsync(id);
     }
 
     public async Task<int> SaveGameAsync(Game game)

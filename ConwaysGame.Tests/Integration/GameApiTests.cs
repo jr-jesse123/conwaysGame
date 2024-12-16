@@ -67,13 +67,38 @@ public class GameApiTests : IClassFixture<WebApplicationFactory<Program>>
 
         // Assert
         response.EnsureSuccessStatusCode();
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-
+        
         var content = await response.Content.ReadAsStringAsync();
         var gameResponse = Deserialize<StarGameResponse>(content);
 
         gameResponse.Id.Should().BeGreaterThan(0);
     }
 
+    [Fact]
+    public async Task Get_Game_State_Retuns_NextState()
+    {
+        // Arrange
+        var client = _factory.CreateClient();
+        var payload = new StartGameRequest(
+            [(1,0), (1, 1), (1, 2)],
+            9
+            );
 
-} 
+        // Act
+        var response = await client.PostAsync("/game", JsonContent.Create(payload));
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        var gameResponse = Deserialize<StarGameResponse>(content);
+
+        var stateResponse = await client.PostAsync($"/game/{gameResponse.Id}", JsonContent.Create(new NextStateRequest(gameResponse.Id)));
+
+        var stateResponseContent = await stateResponse.Content.ReadAsStringAsync();
+
+        var stateObject = Deserialize<NextStateResponse>(stateResponseContent);
+
+
+    }
+
+
+}
