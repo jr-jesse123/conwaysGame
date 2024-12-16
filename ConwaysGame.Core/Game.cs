@@ -29,11 +29,11 @@ public class Game
     public int Id { get; set; }
 
     private int _gridSideLenght;
-    private List<(int x, int y)> _liveCeels;
+    //private List<(int x, int y)> _liveCeels;
 
     private readonly ArrayPool<(int, int)> arrayPool = ArrayPool<(int,int)>.Shared;
 
-    public  List<(int x, int y)> LiveCeels { get => _liveCeels; }
+    public List<(int x, int y)> LiveCeels { get; private set; } //{ get => _liveCeels; }
     public int Generation { get; private set; } = 0;
 
     public bool HasStabilized { get; private set; } = false;
@@ -63,7 +63,7 @@ public class Game
         }
 
         _gridSideLenght = gridLenght;
-        _liveCeels = board.ToList();
+        iveCeels = board.ToList();
         MaxGenerations = maxGenerations;
 
         EnsureInitialized();

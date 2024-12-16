@@ -22,7 +22,6 @@ public class GameContext: DbContext
                 .Metadata.SetBeforeSaveBehavior(PropertySaveBehavior.Ignore);
 
             entity.Property(e => e.LiveCeels)
-                //.HasColumnName("LiveCells")
                 .HasConversion(
                     v => string.Join(";", v.Select(t => $"{t.x},{t.y}")),
                     v => ConvertToTupleList(v),

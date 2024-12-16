@@ -100,6 +100,9 @@ public class GameApiTests : IClassFixture<WebApplicationFactory<Program>>
 
         var stateObject = Deserialize<NextStateResponse>(stateResponseContent);
 
+        stateObject.CurrentGeneration.Should().Be(1);
+
+        stateObject.LiveCells.Should().BeEquivalentTo([(0,1), (1,1), (2,1)]);
 
     }
 
