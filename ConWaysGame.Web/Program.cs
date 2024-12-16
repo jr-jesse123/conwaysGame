@@ -17,7 +17,7 @@ public class Program
         builder.Services.AddGameRepository(options =>
         {
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-            options.UseSqlite(connectionString);
+            options.UseSqlite(connectionString, b => b.MigrationsAssembly("ConwaysGame.Infra"));
         });
 
         var app = builder.Build();
