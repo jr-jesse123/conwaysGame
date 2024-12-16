@@ -19,7 +19,6 @@ public class Program
         {
             options.SerializerOptions.PropertyNameCaseInsensitive = true;
             options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-            //options.SerializerOptions.IncludeFields = true;
         });
 
         // Add EF Core
@@ -29,10 +28,7 @@ public class Program
             options.UseSqlite(connectionString);
         });
 
-        var app = builder.Build();
-
-        // Ensure database is created and migrated
-      
+        var app = builder.Build();  
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
@@ -63,7 +59,12 @@ public class Program
                     {
                         StatusCode = statusCode,
                         Message = "An error occurred while processing your request.",
-                        Details = exception.Message
+                        Details = exception switch
+                        {
+                            ArgumentNullException => "Invalid request.",
+                            UnauthorizedAccessException => "Unauthorized access.",
+                            _ => exception.Message
+                        }
                     };
 
                     context.Response.StatusCode = errorDetails.StatusCode;
