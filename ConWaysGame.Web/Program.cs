@@ -14,16 +14,21 @@ public class Program
         builder.Services.AddSwaggerGen();
 
         // Add EF Core
-        
-        builder.Services.AddGameRepository(options => {
+        builder.Services.AddGameRepository(options =>
+        {
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
             options.UseSqlite(connectionString);
         });
-        
 
         var app = builder.Build();
 
-
+        // Ensure database is created and migrated
+        using (var scope = app.Services.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<GameContext>();
+            
+            dbContext.Database.Migrate();
+        }
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
@@ -54,11 +59,8 @@ public class Program
 
         app.MapPost("/game", async (IGameRepository repository, StartGameRequest startGameDto) =>
         {
-
             var game = new Game(startGameDto.LiveCells, startGameDto.GameLenght);
-
             var id = await repository.SaveGameAsync(game);
-
             return Results.Ok(new StarGameResponse(id));
         })
         .WithName("StartGame")

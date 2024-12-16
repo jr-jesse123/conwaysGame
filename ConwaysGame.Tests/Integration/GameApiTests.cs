@@ -20,20 +20,31 @@ public class GameApiTests : IClassFixture<WebApplicationFactory<Program>>
         {
             builder.ConfigureServices(services =>
             {
-                // Remove the GameRepository registration that uses SQLite
-                var descriptor = services.SingleOrDefault(
-                    d => d.ServiceType == typeof(GameContext));
+                // Remove both the GameRepository and GameContext registrations
+                var descriptors = services.Where(
+                    d => d.ServiceType == typeof(GameContext) ||
+                         d.ServiceType == typeof(IGameRepository) ||
+                         d.ServiceType == typeof(DbContextOptions<GameContext>))
+                    .ToList();
 
-                if (descriptor != null)
+                foreach (var descriptor in descriptors)
                 {
                     services.Remove(descriptor);
                 }
 
-                // Add GameRepository with in-memory database
+                // Add DbContext with in-memory database
+                //services.AddDbContext<GameContext>(options =>
+                //{
+                //    options.UseInMemoryDatabase("TestingDb");
+                //});
+
                 services.AddGameRepository(options =>
                 {
                     options.UseInMemoryDatabase("TestingDb");
                 });
+
+                // Add GameRepository
+                //services.AddScoped<IGameRepository, GameRepository>();
             });
         });
     }
