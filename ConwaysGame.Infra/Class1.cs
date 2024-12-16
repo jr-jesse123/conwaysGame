@@ -17,18 +17,22 @@ public class GameContext: DbContext
 
 public class GameRepository : IGameRepository
 {
-    public GameRepository()
+    private readonly GameContext context;
+
+    public GameRepository(GameContext context)
     {
-                
+        this.context = context;
     }
-    public Task<Game> GetGameAsync(int id)
+    public async Task<Game> GetGameAsync(int id)
     {
         throw new NotImplementedException();
     }
 
-    public Task<int> SaveGameAsync(Game game)
+    public async Task<int> SaveGameAsync(Game game)
     {
-        throw new NotImplementedException();
+        await context.Games.AddAsync(game);
+        await context.SaveChangesAsync();
+        return game.Id;
     }
 }
 

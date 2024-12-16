@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ConwaysGame.Infra;
+using ConwaysGame.Core;
 
 public class Program
 {
@@ -22,12 +23,7 @@ public class Program
 
         var app = builder.Build();
 
-        // Apply migrations
-        //using (var scope = app.Services.CreateScope())
-        //{
-        //    var db = scope.ServiceProvider.GetRequiredService<GameContext>();
-        //    db.Database.EnsureCreated();
-        //}
+
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
@@ -56,21 +52,14 @@ public class Program
         .WithName("GetWeatherForecast")
         .WithOpenApi();
 
-        app.MapPost("/game", async (GameContext db, StartGameRequest startGameDto) =>
+        app.MapPost("/game", async (IGameRepository repository, StartGameRequest startGameDto) =>
         {
-            //var game = new Game
-            //{
-            //    LiveCells = startGameDto.LiveCells.Select(cell => new CellPosition 
-            //    { 
-            //        X = cell.Item1, 
-            //        Y = cell.Item2 
-            //    }).ToList()
-            //};
-            
-            //db.Games.Add(game);
-            //await db.SaveChangesAsync();
 
-            return Results.Ok(new StarGameResponse(0));
+            var game = new Game(startGameDto.LiveCells, startGameDto.GameLenght);
+
+            var id = await repository.SaveGameAsync(game);
+
+            return Results.Ok(new StarGameResponse(id));
         })
         .WithName("StartGame")
         .WithOpenApi();
@@ -79,7 +68,7 @@ public class Program
     }
 }
 
-public record StartGameRequest(List<(int, int)> LiveCells);
+public record StartGameRequest(List<(int, int)> LiveCells, int GameLenght);
 
      
 public record StarGameResponse(int Id);
