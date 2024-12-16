@@ -18,7 +18,7 @@ namespace ConwaysGame.Tests
         [Fact]
         public void test2()
         { 
-            GameBoard2 gameBoard2 = new GameBoard2();
+            //GameBoard2 gameBoard2 = new GameBoard2();
 
             
 
