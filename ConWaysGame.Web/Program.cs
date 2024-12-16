@@ -97,7 +97,7 @@ public class Program
 
             await repository.SaveGameAsync(game);
 
-            return Results.Ok(new NextStateResponse(game.Id,game.Generation, game.LiveCeels.Select(c => new Coords(c.x, c.y)).ToList()));
+            return Results.Ok(new NextStateResponse(game.Id,game.Generation, game.LiveCells.Select(c => new Coords(c.x, c.y)).ToList()));
             
         })
         .WithName("NextState")

@@ -23,7 +23,7 @@ public class Game
     /// <summary>
     /// Represents the living cells
     /// </summary>
-    public List<(int x, int y)> LiveCeels { get; private set; }
+    public List<(int x, int y)> LiveCells { get; private set; }
     /// <summary>
     /// The current generation of the game.
     /// </summary>
@@ -84,9 +84,9 @@ public class Game
         }
 
         TotalGridCeels = gridLenght;
-        LiveCeels = coords.ToList();
+        LiveCells = coords.ToList();
         MaxGenerations = maxGenerations;
-        LiveCeels.Sort(new CellComparer());
+        LiveCells.Sort(new CellComparer());
 
         EnsureInitialized();
 
@@ -94,7 +94,7 @@ public class Game
 
     private void EnsureInitialized()
     {
-        LiveCeels.Sort(new CellComparer()); //Sort the live cells to make the search faster
+        LiveCells.Sort(new CellComparer()); //Sort the live cells to make the search faster
         newLiveCellsArray ??= arrayPool.Rent(TotalGridCeels);
         newLiveCells ??= new List<(int, int)>(newLiveCellsArray);
         positionsWithLiveNeighbors ??= new Dictionary<(int, int), int>(TotalGridCeels);
@@ -104,7 +104,7 @@ public class Game
     public void AddNeighbors(int idx, Dictionary<(int,int), int> acc)
     {
         Span<(int x, int y)> neighbors = stackalloc  (int x, int y)[8];
-        var (x, y) = LiveCeels[idx];
+        var (x, y) = LiveCells[idx];
 
         neighbors[0] = (x - 1, y);
         neighbors[1] = (x + 1, y);
@@ -153,7 +153,7 @@ public class Game
 
         if (Generation >= MaxGenerations) throw new BrokenRuleException("The maximum number of generations has been reached.");
 
-        for (int i = 0; i < LiveCeels.Count; i++)
+        for (int i = 0; i < LiveCells.Count; i++)
         {
             AddNeighbors(i, positionsWithLiveNeighbors);
         }
@@ -165,20 +165,20 @@ public class Game
 
             var liveNeighbors = positionsWithLiveNeighbors[(x, y)];
 
-            if (liveNeighbors == 3 || (liveNeighbors == 2 && LiveCeels.BinarySearch((x, y)) > -1))   
+            if (liveNeighbors == 3 || (liveNeighbors == 2 && LiveCells.BinarySearch((x, y)) > -1))   
                 newLiveCells.Add((x, y));
             
         }
 
         newLiveCells.Sort(new CellComparer()); //Sort the live cells to make the comparison precise.
 
-        if (newLiveCells.SequenceEqual(LiveCeels))
+        if (newLiveCells.SequenceEqual(LiveCells))
         {
             HasStabilized = true;
         }
 
-        LiveCeels.Clear();
-        LiveCeels.AddRange(newLiveCells);  
+        LiveCells.Clear();
+        LiveCells.AddRange(newLiveCells);  
 
         Generation++;
     }

@@ -16,7 +16,7 @@ public class GameTests
         {
             var game = new Core.Game([input], 9);
             game.AdvanceGenerations(1);
-            game.LiveCeels.Count.Should().Be(0);
+            game.LiveCells.Count.Should().Be(0);
         }
     }
 
@@ -39,7 +39,7 @@ public class GameTests
         {
             var game = new Core.Game(input, 9);
             game.AdvanceGenerations(1);
-            game.LiveCeels.Where(c => c == input[1]).Should().HaveCount(1);
+            game.LiveCells.Where(c => c == input[1]).Should().HaveCount(1);
         }
     }
 
@@ -64,7 +64,7 @@ public class GameTests
             var game = new Core.Game(input.input, 9);
             game.AdvanceGenerations(1);
 
-            input.expected.Should().BeSubsetOf(game.LiveCeels);
+            input.expected.Should().BeSubsetOf(game.LiveCells);
 
         }
     }
@@ -81,7 +81,7 @@ public class GameTests
 
         game.AdvanceGenerations(1);
 
-        game.LiveCeels.Count.Should().Be(4);
+        game.LiveCells.Count.Should().Be(4);
     }
 
 
@@ -104,7 +104,7 @@ public class GameTests
         {
             var game = new Core.Game(input, 9);
             game.AdvanceGenerations(1);
-            game.LiveCeels.Any().Should().BeFalse();
+            game.LiveCells.Any().Should().BeFalse();
         }
 
     }
@@ -128,6 +128,6 @@ public class GameTests
             game.AdvanceGenerations(1);
         }
 
-        game.LiveCeels.Count.Should().Be(4);
+        game.LiveCells.Count.Should().Be(4);
     }
 }

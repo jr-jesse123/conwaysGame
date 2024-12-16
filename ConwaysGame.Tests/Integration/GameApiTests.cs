@@ -28,7 +28,7 @@ public class GameApiTests : IClassFixture<WebApplicationFactory<Program>>
             {
                 services.RemoveAll<GameContext>();
 
-                services.AddGameRepository(options => options.UseSqlite("DataSource=:memory:"));
+                services.AddGameRepository(options => options.UseSqlite("DataSource={:memory:}"));
 
                 var context = services.BuildServiceProvider().GetRequiredService<GameContext>();
                 context.Database.EnsureCreated();

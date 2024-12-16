@@ -2,6 +2,7 @@
 using ConwaysGame.Web.Infra;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ConWaysGame.Web.Migrations
 {
     [DbContext(typeof(GameContext))]
-    partial class GameContextModelSnapshot : ModelSnapshot
+    [Migration("20241216203845_TextLenght2")]
+    partial class TextLenght2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.0");
@@ -28,11 +31,11 @@ namespace ConWaysGame.Web.Migrations
                     b.Property<bool>("HasStabilized")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("LiveCells")
+                    b.Property<string>("LiveCeels")
                         .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("TEXT")
-                        .HasColumnName("LiveCells");
+                        .HasColumnName("LiveCeels");
 
                     b.Property<int>("TotalGridCeels")
                         .HasColumnType("INTEGER");

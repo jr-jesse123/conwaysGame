@@ -9,6 +9,7 @@ public class GameContext: DbContext
 {
     public GameContext(DbContextOptions<GameContext> options) : base(options)
     {
+
     }
     public DbSet<Game> Games { get; set; }
 
@@ -23,7 +24,9 @@ public class GameContext: DbContext
 
             entity.Property(e => e.TotalGridCeels);
 
-            entity.Property(e => e.LiveCeels)
+            entity.Property(e => e.LiveCells)
+                .HasColumnName("LiveCells")
+                .HasMaxLength(1000)
                 .HasConversion(
                     v => ConvertTupleToString(v),
                     v => ConvertToTupleList(v),
