@@ -25,7 +25,7 @@ public class Game
     private List<(int x, int y)> _board;
 
     ArrayPool<(int, int)> arrayPool = ArrayPool<(int,int)>.Shared;
-        //public readonly ReadOnlySpan<(int x, int y)> Board { get => _board;  }
+
         public  List<(int x, int y)> LiveCeels { get => _board; }
     public int Generation { get; private set; } = 0;
 
@@ -51,7 +51,7 @@ public class Game
     public Game(IEnumerable<(int x, int y)> board, int gridLenght,  int maxGenerations = 1000)
     {
 
-        if (Math.Sqrt(gridLenght) % 1 != 0)
+        if (Math.Sqrt(gridLenght) % 1 != 0 || gridLenght == 1)
         {
             throw new ArgumentException("The board length must be a perfect square.");
         }
@@ -104,11 +104,6 @@ public class Game
         }
     }
 
-    public void GoToStabilization()
-    {
-
-    }
-
     public void AdvanceGeneration()
     {
         if (Generation >= MaxGenerations)
@@ -122,9 +117,6 @@ public class Game
         {
             AddNeighbors(i, positionsWithLiveNeighbors);
         }
-
-        
-
         
         newLiveCells.Clear();
         foreach (var (x, y) in positionsWithLiveNeighbors.Keys)
@@ -149,8 +141,6 @@ public class Game
 
         _board.Clear();
         _board.AddRange(newLiveCells);  
-
-        
 
         Generation++;
     }
