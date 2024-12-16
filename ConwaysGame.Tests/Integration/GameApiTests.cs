@@ -7,6 +7,7 @@ using System.Text.Json;
 using ConwaysGame.Core;
 using ConwaysGame.Web.Infra;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace ConwaysGame.Tests.Integration;
 
@@ -24,32 +25,12 @@ public class GameApiTests : IClassFixture<WebApplicationFactory<Program>>
         {
             builder.ConfigureServices(services =>
             {
-                // Remove both the GameRepository and GameContext registrations
-                var descriptors = services.Where(
-                    d => d.ServiceType == typeof(GameContext)
-                         ||
-                         d.ServiceType == typeof(IGameRepository) ||
-                         d.ServiceType == typeof(DbContextOptions<GameContext>)
-                         )
-                    .ToList();
+                services.RemoveAll<GameContext>();
 
-                foreach (var descriptor in descriptors)
-                {
-                    services.Remove(descriptor);
-                }
-
-                services.AddGameRepository(options =>
-                {
-                    options.UseSqlite("DataSource=:memory:", b => b.MigrationsAssembly("ConwaysGame.WEb"));
-                });
+                services.AddGameRepository(options => options.UseSqlite("DataSource=:memory:"));
 
                 var context = services.BuildServiceProvider().GetRequiredService<GameContext>();
-                //context.Database.EnsureDeleted();
-                //context.Database.OpenConnection();
-                //context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
-                //context.Database.Migrate();
-
             });
         });
     }
