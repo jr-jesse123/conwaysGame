@@ -28,17 +28,17 @@ public class Game
 {
     public int Id { get; set; }
 
-    private readonly int _gridSideLenght;
-    private List<(int x, int y)> _board;
+    private int _gridSideLenght;
+    private List<(int x, int y)> _liveCeels;
 
     private readonly ArrayPool<(int, int)> arrayPool = ArrayPool<(int,int)>.Shared;
 
-    public  List<(int x, int y)> LiveCeels { get => _board; }
+    public  List<(int x, int y)> LiveCeels { get => _liveCeels; }
     public int Generation { get; private set; } = 0;
 
     public bool HasStabilized { get; private set; } = false;
 
-    private int MaxGenerations { get; init ; } = 1000;
+    private int MaxGenerations { get; set ; } = 1000;
     private (int x, int y)[] newLiveCellsArray;
 
     private List<(int, int)> newLiveCells;
@@ -61,23 +61,29 @@ public class Game
         {
             throw new ArgumentException("The board length must be a perfect square.");
         }
-        
 
-        MaxGenerations = maxGenerations;
         _gridSideLenght = gridLenght;
-        _board = board.ToList();
-        _board.Sort(new CellComparer());
-        
-        newLiveCellsArray = arrayPool.Rent(_gridSideLenght);
-        newLiveCells = new List<(int, int)>(newLiveCellsArray);
-        positionsWithLiveNeighbors = new Dictionary<(int, int), int>(_gridSideLenght);
+        _liveCeels = board.ToList();
+        MaxGenerations = maxGenerations;
+
+        EnsureInitialized();
 
     }
+
+    private void EnsureInitialized()
+    {
+        _liveCeels.Sort(new CellComparer());
+
+        newLiveCellsArray ??= arrayPool.Rent(_gridSideLenght);
+        newLiveCells ??= new List<(int, int)>(newLiveCellsArray);
+        positionsWithLiveNeighbors ??= new Dictionary<(int, int), int>(_gridSideLenght);
+    }
+
 
     public void AddNeighbors(int idx, Dictionary<(int,int), int> acc)
     {
         Span<(int x, int y)> neighbors = stackalloc  (int x, int y)[8];
-        var (x, y) = _board[idx];
+        var (x, y) = _liveCeels[idx];
 
         neighbors[0] = (x - 1, y);
         neighbors[1] = (x + 1, y);
@@ -112,6 +118,8 @@ public class Game
 
     public void AdvanceGeneration()
     {
+        EnsureInitialized();
+
         if (Generation >= MaxGenerations)
         {
             throw new NotSupportedException("The maximum number of generations has been reached.");
@@ -145,8 +153,8 @@ public class Game
             HasStabilized = true;
         }
 
-        _board.Clear();
-        _board.AddRange(newLiveCells);  
+        _liveCeels.Clear();
+        _liveCeels.AddRange(newLiveCells);  
 
         Generation++;
     }

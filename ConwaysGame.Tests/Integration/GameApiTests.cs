@@ -44,8 +44,11 @@ public class GameApiTests : IClassFixture<WebApplicationFactory<Program>>
                 });
 
                 var context = services.BuildServiceProvider().GetRequiredService<GameContext>();
-                context.Database.OpenConnection();
+                //context.Database.EnsureDeleted();
+                //context.Database.OpenConnection();
+                //context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
+                //context.Database.Migrate();
 
             });
         });
