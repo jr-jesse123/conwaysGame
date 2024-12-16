@@ -8,6 +8,7 @@ using ConwaysGame.Core;
 using ConwaysGame.Web.Infra;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using ConWaysGame.Web.Dtos;
 
 namespace ConwaysGame.Tests.Integration;
 

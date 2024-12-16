@@ -1,5 +1,6 @@
 using ConwaysGame.Core;
 using ConwaysGame.Web.Infra;
+using ConWaysGame.Web.Dtos;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
