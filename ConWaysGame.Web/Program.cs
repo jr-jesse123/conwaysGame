@@ -38,10 +38,10 @@ public class Program
         .WithName("GetWeatherForecast")
         .WithOpenApi();
 
-        app.MapPost("/game", (StartGameDto startGameDto) =>
+        app.MapPost("/game", (StartGameRequest startGameDto) =>
         {
-            // Process the startGameDto instance here
-            return Results.Ok(startGameDto);
+            
+            return Results.Ok(new StarGameResponse(0));
         })
         .WithName("StartGame")
         .WithOpenApi();
@@ -50,10 +50,11 @@ public class Program
     }
 }
 
-public record StartGameDto
-{
-    public List<(int, int)> LiveCells { get; init; }
-}
+public record StartGameRequest(List<(int, int)> LiveCells);
+
+     
+public record StarGameResponse(int Id);
+
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
