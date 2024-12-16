@@ -169,11 +169,9 @@ public class GameApiTests : IClassFixture<WebApplicationFactory<Program>>
 
         var stateResponseContent = await stateResponse.Content.ReadAsStringAsync();
 
-        var stateObject = Deserialize<NextStateResponse>(stateResponseContent);
+        var stateObject = Deserialize<ErrorDetails>(stateResponseContent);
 
-        stateObject.CurrentGeneration.Should().Be(3);
-
-        stateObject.LiveCells.Should().BeEquivalentTo([new Coords(1, 1), new(1, 2), new(2, 1), new(2, 2)]);
+        stateObject.Details.Should().Be("The maximum number of generations has been reached.");
 
     }
 

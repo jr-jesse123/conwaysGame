@@ -1,5 +1,6 @@
 using ConwaysGame.Core;
 using ConwaysGame.Web.Infra;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
@@ -40,7 +41,36 @@ public class Program
             app.UseSwaggerUI();
         }
 
+        app.UseExceptionHandler(errorApp =>
+        {
+            errorApp.Run(async context =>
+            {
+                context.Response.ContentType = "application/json";
+                var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerFeature>();
+                if (exceptionHandlerFeature != null)
+                {
+                    var exception = exceptionHandlerFeature.Error;
 
+                    var statusCode = exception switch
+                    {
+                        ArgumentNullException => StatusCodes.Status400BadRequest,
+                        UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
+                        MaxGenerationsReachedException => StatusCodes.Status403Forbidden,
+                        _ => StatusCodes.Status500InternalServerError
+                    };
+
+                    var errorDetails = new ErrorDetails
+                    {
+                        StatusCode = statusCode,
+                        Message = "An error occurred while processing your request.",
+                        Details = exception.Message
+                    };
+
+                    context.Response.StatusCode = errorDetails.StatusCode;
+                    await context.Response.WriteAsync(errorDetails.ToString());
+                }
+            });
+        });
 
         app.MapPost("/game", async (IGameRepository repository, StartGameRequest request) =>
         {
@@ -88,3 +118,14 @@ public record StartGameRequest(List<Coords> LiveCells, int GameLenght);
      
 public record StarGameResponse(int Id);
 
+public class ErrorDetails
+{
+    public int StatusCode { get; set; }
+    public string Message { get; set; }
+    public string? Details { get; set; } // Opcional, pode incluir informações adicionais
+
+    public override string ToString()
+    {
+        return System.Text.Json.JsonSerializer.Serialize(this);
+    }
+}

@@ -135,7 +135,7 @@ public class Game
 
         if (Generation >= MaxGenerations)
         {
-            throw new NotSupportedException("The maximum number of generations has been reached.");
+            throw new MaxGenerationsReachedException("The maximum number of generations has been reached.");
         }
 
         for (int i = 0; i < LiveCeels.Count; i++)
@@ -169,4 +169,11 @@ public class Game
         Generation++;
     }
 
+}
+
+public class MaxGenerationsReachedException : Exception
+{
+    public MaxGenerationsReachedException(string message) : base(message)
+    {
+    }
 }

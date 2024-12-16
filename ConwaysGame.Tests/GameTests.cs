@@ -1,5 +1,6 @@
 //global using GameBoard = bool[,];
 //global using LivePopulation = (int x, int y)[]; //TODO: duplicate global using
+using ConwaysGame.Core;
 using FluentAssertions;
 
 namespace ConwaysGame.Tests
@@ -116,7 +117,7 @@ namespace ConwaysGame.Tests
         {
             var game = new Core.Game([], 9, 0);
             Action act = () => game.AdvanceGenerations(10);
-            act.Should().Throw<NotSupportedException>();
+            act.Should().Throw<MaxGenerationsReachedException>();
         }
 
         [Fact]
