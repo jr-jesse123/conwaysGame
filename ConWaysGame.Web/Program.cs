@@ -1,6 +1,6 @@
-using Microsoft.EntityFrameworkCore;
-using ConwaysGame.Infra;
 using ConwaysGame.Core;
+using ConwaysGame.Web.Infra;
+using Microsoft.EntityFrameworkCore;
 
 public class Program
 {

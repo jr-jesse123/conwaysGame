@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using FluentAssertions;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using ConwaysGame.Infra;
 using ConwaysGame.Core;
+using ConwaysGame.Web.Infra;
 
 namespace ConwaysGame.Tests.Integration;
 
