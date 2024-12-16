@@ -46,8 +46,6 @@ public class Game
 
     private Game()
     {
-        EnsureInitialized();
-
     }
 
     ~Game()
@@ -73,6 +71,7 @@ public class Game
 
     private void EnsureInitialized()
     {
+        LiveCeels.Sort(new CellComparer());
         newLiveCellsArray ??= arrayPool.Rent(TotalGridCeels);
         newLiveCells ??= new List<(int, int)>(newLiveCellsArray);
         positionsWithLiveNeighbors ??= new Dictionary<(int, int), int>(TotalGridCeels);
@@ -109,7 +108,19 @@ public class Game
 
     public void AdvanceGenerations(int generations)
     {
+        
         for (int i = 0; i < generations; i++)
+        {
+            if (HasStabilized) return;
+
+            AdvanceGeneration();
+        }
+    }
+
+
+    public void RunToCompletition()
+    {
+        while (!HasStabilized)
         {
             AdvanceGeneration();
         }

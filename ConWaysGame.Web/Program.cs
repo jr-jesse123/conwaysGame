@@ -64,6 +64,8 @@ public class Program
 
             game.AdvanceGenerations(request.NumberOfGenerations);
 
+            await repository.SaveGameAsync(game);
+
             return Results.Ok(new NextStateResponse(game.Id,game.Generation, game.LiveCeels.Select(c => new Coords(c.x, c.y)).ToList()));
             
         })
@@ -75,7 +77,7 @@ public class Program
     }
 }
 
-public record NextStateRequest(int Id, int NumberOfGenerations = 1);
+public record NextStateRequest(int Id, int NumberOfGenerations = int.MaxValue);
 
 public record Coords(int x, int y);
 
