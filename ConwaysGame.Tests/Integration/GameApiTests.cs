@@ -14,6 +14,10 @@ public class GameApiTests : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly WebApplicationFactory<Program> _factory;
 
+    protected T? Deserialize<T>(string content)
+    {
+        return JsonSerializer.Deserialize<T>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+    }
     public GameApiTests(WebApplicationFactory<Program> factory)
     {
         _factory = factory.WithWebHostBuilder(builder =>
@@ -66,11 +70,8 @@ public class GameApiTests : IClassFixture<WebApplicationFactory<Program>>
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var content = await response.Content.ReadAsStringAsync();
-        var gameResponse = JsonSerializer.Deserialize<StarGameResponse>(content);
+        var gameResponse = Deserialize<StarGameResponse>(content);
 
-        var content2 = await response.Content.ReadAsStringAsync();
-        var gameResponse2 = JsonSerializer.Deserialize<StarGameResponse>(content);
-        
-        gameResponse2.Id.Should().BeGreaterThan(0);
+        gameResponse.Id.Should().BeGreaterThan(0);
     }
 } 

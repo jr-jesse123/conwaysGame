@@ -1,6 +1,7 @@
 using ConwaysGame.Core;
 using ConwaysGame.Web.Infra;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 public class Program
 {
@@ -12,6 +13,12 @@ public class Program
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+
+        // Configurar JSON serialization para ser case insensitive
+        //builder.Services.ConfigureHttpJsonOptions(options =>
+        //{
+            
+        //});
 
         // Add EF Core
         builder.Services.AddGameRepository(options =>
