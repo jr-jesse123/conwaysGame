@@ -115,23 +115,23 @@ public class Game
         }
     }
 
-    public void AdvanceGeneration()
+    private void AdvanceGeneration()
     {
         EnsureInitialized();
+        positionsWithLiveNeighbors.Clear();
+        newLiveCells.Clear();
+
 
         if (Generation >= MaxGenerations)
         {
             throw new NotSupportedException("The maximum number of generations has been reached.");
         }
 
-        positionsWithLiveNeighbors.Clear();
-
         for (int i = 0; i < LiveCeels.Count; i++)
         {
             AddNeighbors(i, positionsWithLiveNeighbors);
         }
         
-        newLiveCells.Clear();
         foreach (var (x, y) in positionsWithLiveNeighbors.Keys)
         {
             if(x < 0 || y < 0 || x > Math.Sqrt(TotalGridCeels) - 1 || y > Math.Sqrt(TotalGridCeels) - 1)

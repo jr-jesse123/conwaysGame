@@ -17,7 +17,7 @@ namespace ConwaysGame.Tests
             foreach (var input in inputs)
             {
                 var game = new Core.Game([input], 9);
-                game.AdvanceGeneration();
+                game.AdvanceGenerations(1);
                 game.LiveCeels.Count.Should().Be(0);
             }
         }
@@ -40,7 +40,7 @@ namespace ConwaysGame.Tests
             foreach (var input in inputs)
             {
                 var game = new Core.Game(input, 9);
-                game.AdvanceGeneration();
+                game.AdvanceGenerations(1);
                 game.LiveCeels.Single(c => c == input[1]);
             }
         }
@@ -64,7 +64,7 @@ namespace ConwaysGame.Tests
             foreach (var input in inputs)
             {
                 var game = new Core.Game(input.input, 9);
-                game.AdvanceGeneration();
+                game.AdvanceGenerations(1);
 
                 input.expected.Should().BeSubsetOf(game.LiveCeels);
 
@@ -81,7 +81,7 @@ namespace ConwaysGame.Tests
 
             var game = new Core.Game(inputs, 9);
 
-            game.AdvanceGeneration();
+            game.AdvanceGenerations(1);
 
             game.LiveCeels.Count.Should().Be(4);
         }
@@ -105,7 +105,7 @@ namespace ConwaysGame.Tests
             foreach (var input in inputs)
             {
                 var game = new Core.Game(input, 9);
-                game.AdvanceGeneration();
+                game.AdvanceGenerations(1);
                 game.LiveCeels.Any().Should().BeFalse();
             }
 
@@ -127,7 +127,7 @@ namespace ConwaysGame.Tests
 
             while (!game.HasStabilized)
             {
-                game.AdvanceGeneration();
+                game.AdvanceGenerations(1);
             }
 
             game.LiveCeels.Count.Should().Be(4);
