@@ -1,5 +1,5 @@
-global using GameBoard = bool[,];
-global using LivePopulation = (int x, int y)[]; //TODO: duplicate global using
+//global using GameBoard = bool[,];
+//global using LivePopulation = (int x, int y)[]; //TODO: duplicate global using
 using ConwaysGame.Core;
 using FluentAssertions;
 using System.Security.Cryptography.X509Certificates;
@@ -11,46 +11,82 @@ namespace ConwaysGame.Tests
      
 
         [Fact]
-        public void test2()
-        { 
-            //GameBoard2 gameBoard2 = new GameBoard2();
+        public void SingleCellDies()
+        {
+            var inputs = from x in Enumerable.Range(0, 3)
+                         from y in Enumerable.Range(0, 3)
+                         select (x, y);
 
-            
-
-            //Span<bool> bools = stackalloc bool[x];
+            foreach (var input in inputs)
+            {
+                var game = new Game(new Span<(int x, int y)>([input]), 9);
+                game.AdvanceGeneration();
+                game.Board.ToArray().Count().Should().Be(0);
+            }
         }
-
+        
 
             //}
 
             [Fact]
         public void test()
         {
-            
-            var x = GenerateAllCombinations(8);
-            var boardsAndExpectedLiveness = x.Select(combination =>
-            {
-                var board = new bool[3, 3];
-                int index = 0;
-                
-                for (int row = 0; row < 3; row++)
+
+            var lenght = 8;
+            var x = GenerateAllCombinations(lenght)
+                .Select<bool[], (int, int)[]>(k =>
                 {
-                    for (int col = 0; col < 3; col++)
+                    var sideLenght = Math.Sqrt(lenght);
+
+                    (int, int)[] input = k.Select<bool,(int,int)?>((b, i) =>
                     {
-                        if (row == 1 && col == 1) continue; // Skip center position
-                        board[row, col] = combination[index++];
-                    }
-                }
-                
-                return (board, combination.Count(k => k));
-            }).ToArray();
+                        if (b)
+                        {
+                            return ((int)(i % sideLenght), (int)(i / sideLenght));
+                        }
+                        else
+                        {
+                            return new Nullable<(int,int)>();
+                        }
+                    })
+                    .Where(x => x is not null)
+                    .Cast<(int, int)>()
+                    .ToArray();
+
+
+                    return input;
+                });
+
+            //var boardsAndExpectedLiveness = x.Select(coords =>
+            //{
+            //    return new Game(coords);
+            //});
+
+            //boardsAndExpectedLiveness
+            //var boardsAndExpectedLiveness = x.Select(combination =>
+            //{
+            //    var board = new bool[3, 3];
+            //    int index = 0;
+
+            //    for (int row = 0; row < 3; row++)
+            //    {
+            //        for (int col = 0; col < 3; col++)
+            //        {
+            //            if (row == 1 && col == 1) continue; // Skip center position
+            //            board[row, col] = combination[index++];
+            //        }
+            //    }
+
+            //    return (board, combination.Count(k => k));
+            //}).ToArray();
 
 
 
-            boardsAndExpectedLiveness.Should().AllSatisfy(x =>
-            {
-                //GameBoardModule.GetLiveNeighbors(x.board, 1, 1).Should().Be(x.Item2);
-            });
+            //boardsAndExpectedLiveness.Should().AllSatisfy(x =>
+            //{
+
+            //    //GameBoardModule.GetLiveNeighbors(x.board, 1, 1).Should().Be(x.Item2);
+            //});
 
 
 

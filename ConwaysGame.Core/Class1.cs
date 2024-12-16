@@ -12,7 +12,7 @@ Any dead cell with exactly three live neighbors becomes a live cell, as if by re
 
 
 
-global using Gameboard = System.Span<(int x, int y)>;
+
 namespace ConwaysGame.Core;
 
 public class CellComparer : IComparer<(int x, int y)>
@@ -148,10 +148,10 @@ public class CellComparer : IComparer<(int x, int y)>
 
     public ref struct Game
     {
-        //private readonly int _gridLenght;
-        private Gameboard _board;
+    private readonly int _gridSideLenght;
+    private Span<(int x, int y)> _board;
 
-        public readonly Gameboard Board { get => _board;  }
+        public readonly ReadOnlySpan<(int x, int y)> Board { get => _board;  }
         public int Generation { get; private set; } = 0;
 
         public bool HasStabilized { get; private set; } = false;
@@ -163,59 +163,25 @@ public class CellComparer : IComparer<(int x, int y)>
         throw new NotSupportedException("You must provide a board to start the game.");
     }
 
-    public Game(Gameboard board, int maxGenerations = 1000)
+    public Game(Span<(int x, int y)> board, int gridLenght,  int maxGenerations = 1000)
     {
 
-        if (Math.Sqrt(board.Length) % 1 != 0)
+        if (Math.Sqrt(gridLenght) % 1 != 0)
         {
             throw new ArgumentException("The board length must be a perfect square.");
         }
         board.Sort(new CellComparer());
 
         MaxGenerations = maxGenerations;
-
-        _board = board;
+        _gridSideLenght = gridLenght;
+        _board = stackalloc (int,int)?[1];
         //_gridLenght = (int)Math.Sqrt(board.Length) ;
 
     }
 
-
-
-    ////TODO: FAZER INTERNO
-    ////TODO: TENTAR OPTIMIZAR
-    //public int GetLiveNeighBors(int idx)
-    //{
-        
-
-    //    var (x, y) = _board[idx];
-
-    //    return 
-    //        _board.LookBackWard(idx, (x - 1, y)) +
-    //        _board.LookFoward(idx, (x + 1, y)) +
-
-    //        _board.LookFoward(idx, (x, y - 1) ) +
-    //        _board.LookFoward(idx, (x, y + 1)) +
-    //        _board.LookBackWard(0, (x - 1, y - 1)) +
-
-    //        _board.LookFoward(0, (x - 1, y + 1)) +
-
-    //        _board.LookBackWard(0, (x + 1, y - 1)) +
-    //        _board.LookFoward(0, (x + 1, y + 1));
-
-    //}
-
-
-    /*
-     Any live cell with fewer than two live neighbors dies, as if by underpopulation.
-    Any live cell with two or three live neighbors lives on to the next generation.
-    Any live cell with more than three live neighbors dies, as if by overpopulation.
-    Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
-     */
-
-
     public void AddNeighbors(int idx, Dictionary<(int,int), int> acc)
     {
-        Span<(int x, int y)?> neighbors = stackalloc  (int x, int y)?[8];
+        Span<(int x, int y)> neighbors = stackalloc  (int x, int y)[8];
         var (x, y) = _board[idx];
 
         neighbors[0] = (x - 1, y);
@@ -229,13 +195,13 @@ public class CellComparer : IComparer<(int x, int y)>
 
         for (int i = 0; i < neighbors.Length; i++)
         {
-            if (acc.ContainsKey((x, y)))
+            if (acc.ContainsKey(neighbors[i]))
             {
-                acc[(x, y)]++;
+                acc[neighbors[i]]++;
             }
             else
             {
-                acc[(x, y)] = 1;
+                acc[neighbors[i]] = 1;
             } 
         }
 
@@ -262,11 +228,11 @@ public class CellComparer : IComparer<(int x, int y)>
             AddNeighbors(i, positionsWithLiveNeihbors);
         }
 
-        Span<(int,int)> newLiveCells = stackalloc (int x, int y)[Board.Length];
+        Span<(int,int)> newLiveCells = stackalloc (int x, int y)[_gridSideLenght ^ 2];
         var currentIdx = 0;
         foreach (var (x, y) in positionsWithLiveNeihbors.Keys)
         {
-            if(x < 0 || y < 0 || x > Board.Length || y > Board.Length)
+            if(x < 0 || y < 0 || x > _gridSideLenght || y > _gridSideLenght)
                 continue;
 
             var liveNeighbors = positionsWithLiveNeihbors[(x, y)];
@@ -285,7 +251,7 @@ public class CellComparer : IComparer<(int x, int y)>
             HasStabilized = true;
         }
 
-        newLiveCells.CopyTo(_board);
+        newLiveCells.TryCopyTo(_board);
 
         Generation++;
     }
