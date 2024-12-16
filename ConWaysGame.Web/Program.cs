@@ -17,7 +17,7 @@ public class Program
         builder.Services.AddGameRepository(options =>
         {
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-            options.UseSqlite(connectionString, b => b.MigrationsAssembly("ConwaysGame.Infra"));
+            options.UseSqlite(connectionString);
         });
 
         var app = builder.Build();
@@ -26,7 +26,7 @@ public class Program
         using (var scope = app.Services.CreateScope())
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<GameContext>();
-            
+            dbContext.Database.EnsureCreated();
             dbContext.Database.Migrate();
         }
 

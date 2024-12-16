@@ -61,6 +61,7 @@ public class GameApiTests : IClassFixture<WebApplicationFactory<Program>>
         // Act
         var response = await client.PostAsync("/game", JsonContent.Create(payload));
 
+
         // Assert
         response.EnsureSuccessStatusCode();
         response.StatusCode.Should().Be(HttpStatusCode.OK);
