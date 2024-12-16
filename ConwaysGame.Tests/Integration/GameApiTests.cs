@@ -40,7 +40,7 @@ public class GameApiTests : IClassFixture<WebApplicationFactory<Program>>
 
                 services.AddGameRepository(options =>
                 {
-                    options.UseSqlite("DataSource=:teste.db:", b => b.MigrationsAssembly("ConwaysGame.WEb"));
+                    options.UseSqlite("DataSource=:memory:", b => b.MigrationsAssembly("ConwaysGame.WEb"));
                 });
 
                 var context = services.BuildServiceProvider().GetRequiredService<GameContext>();
@@ -74,4 +74,6 @@ public class GameApiTests : IClassFixture<WebApplicationFactory<Program>>
 
         gameResponse.Id.Should().BeGreaterThan(0);
     }
+
+
 } 

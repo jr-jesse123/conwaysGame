@@ -14,12 +14,6 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
-        // Configurar JSON serialization para ser case insensitive
-        //builder.Services.ConfigureHttpJsonOptions(options =>
-        //{
-            
-        //});
-
         // Add EF Core
         builder.Services.AddGameRepository(options =>
         {
