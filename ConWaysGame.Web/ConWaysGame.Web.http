@@ -1,0 +1,6 @@
+@ConWaysGame.Web_HostAddress = http://localhost:5288
+
+GET {{ConWaysGame.Web_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -6,9 +6,9 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace ConwaysGame.Tests
 {
-    public class Game
+    public class GameTests
     {
-     
+
         [Fact]
         public void SingleCellDies()
         {
@@ -27,7 +27,7 @@ namespace ConwaysGame.Tests
         [Fact]
         public void LiveCellsWithTwoLivingNeighborsKeepAlive()
         {
-            List<(int, int)[]> inputs = 
+            List<(int, int)[]> inputs =
                 [
                     [(1, 0), (1, 1), (1, 2)], // Horizontal
                     [(0, 1), (1, 1), (2, 1)], // Vertical
@@ -53,7 +53,7 @@ namespace ConwaysGame.Tests
         {
             List<((int, int)[] input, (int, int)[] expected)> inputs =
             [
-                
+
                 ([(1,0), (1, 1), (1, 2)], [(0,1), (2, 1)]), // Horizontal
                 ([(0, 1), (1, 1), (2, 1)], [(1, 0), (1, 2)]), // Vertical
                 ([(0, 0), (0, 1), (1, 0)], [(1, 1)]), // Corner
@@ -69,7 +69,7 @@ namespace ConwaysGame.Tests
                 game.AdvanceGeneration();
 
                 input.expected.Should().BeSubsetOf(game.LiveCeels);
-                
+
             }
         }
 
@@ -111,6 +111,28 @@ namespace ConwaysGame.Tests
                 game.LiveCeels.Any().Should().BeFalse();
             }
 
+        }
+
+        [Fact]
+        public void ThorwsOnExcededGenerations()
+        {
+            var game = new Core.Game([], 9, 0);
+            Action act = () => game.AdvanceGenerations(10);
+            act.Should().Throw<NotSupportedException>();
+        }
+
+        [Fact]
+        public void CanRecognizeStableGeneration()
+        {
+            (int, int)[] input = [(0,0), (0, 1), (1, 0)];
+            var game = new Core.Game(input, 9);
+
+            while (!game.HasStabilized)
+            {
+                game.AdvanceGeneration();
+            }
+
+            game.LiveCeels.Count.Should().Be(4);
         }
     }
 }

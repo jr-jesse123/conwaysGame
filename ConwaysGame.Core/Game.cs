@@ -55,7 +55,7 @@ public class Game
         {
             throw new ArgumentException("The board length must be a perfect square.");
         }
-        //board.Sort(new CellComparer());
+        
 
         MaxGenerations = maxGenerations;
         _gridSideLenght = gridLenght;
@@ -104,6 +104,11 @@ public class Game
         }
     }
 
+    public void GoToStabilization()
+    {
+
+    }
+
     public void AdvanceGeneration()
     {
         if (Generation >= MaxGenerations)
@@ -134,6 +139,8 @@ public class Game
                 newLiveCells.Add((x, y));
             }
         }
+
+        newLiveCells.Sort(new CellComparer());
 
         if (newLiveCells.SequenceEqual(LiveCeels))
         {
